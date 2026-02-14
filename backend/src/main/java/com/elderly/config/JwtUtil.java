@@ -3,6 +3,8 @@ package com.elderly.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
@@ -11,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class JwtUtil {
     @Value("${jwt.secret}")
@@ -18,6 +21,16 @@ public class JwtUtil {
     
     @Value("${jwt.expiration}")
     private Long expiration;
+    
+    @PostConstruct
+    public void init() {
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException("JWT_SECRET 必须配置且长度至少32字符");
+        }
+        if (secret.contains("dev-only") || secret.contains("do-not-use-in-production")) {
+            log.warn("警告: 当前使用开发环境默认JWT密钥，生产环境必须配置 JWT_SECRET 环境变量");
+        }
+    }
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));

@@ -1,4 +1,7 @@
 -- 智慧养老系统数据库初始化脚本
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS elderly_care DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE elderly_care;
 
