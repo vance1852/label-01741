@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
                 ? e.getBindingResult().getFieldError().getDefaultMessage() 
                 : "参数校验失败";
         log.warn("参数校验失败: {}", message);
-        return Result.error(400, message);
+        return Result.badRequest(message);
     }
 
     @ExceptionHandler(BindException.class)
@@ -26,7 +26,13 @@ public class GlobalExceptionHandler {
                 ? e.getFieldError().getDefaultMessage() 
                 : "参数绑定失败";
         log.warn("参数绑定失败: {}", message);
-        return Result.error(400, message);
+        return Result.badRequest(message);
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Result<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.warn("非法参数: {}", e.getMessage());
+        return Result.badRequest(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)

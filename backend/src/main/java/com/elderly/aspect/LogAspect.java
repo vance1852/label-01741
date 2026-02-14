@@ -61,7 +61,9 @@ public class LogAspect {
         sysLog.setIp(getIpAddress(request));
         
         sysLogService.save(sysLog);
-        log.info("操作日志: {} - {} - {}ms", sysLog.getOperation(), sysLog.getMethod(), time);
+        if (log.isDebugEnabled()) {
+            log.debug("操作日志: {} - {} - {}ms", sysLog.getOperation(), sysLog.getMethod(), time);
+        }
     }
     
     private String sanitizeParams(Object[] args) {

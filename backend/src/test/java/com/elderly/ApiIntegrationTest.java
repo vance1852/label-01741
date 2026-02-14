@@ -77,7 +77,20 @@ public class ApiIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(loginJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(jsonPath("$.code").value(401));
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("登录接口测试 - 用户不存在")
+    void testLoginUserNotFound() throws Exception {
+        String loginJson = "{\"username\":\"nonexistent\",\"password\":\"password\"}";
+        
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(loginJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(401));
     }
 
     @Test
@@ -437,10 +450,25 @@ public class ApiIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(elder)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
                 .andReturn();
 
-        // 删除ID为3的老人（新添加的）
-        mockMvc.perform(delete("/api/elder/3")
+        // 从分页接口获取最新添加的老人ID进行删除
+        MvcResult listResult = mockMvc.perform(get("/api/elder/page")
+                .header("Authorization", "Bearer " + token)
+                .param("current", "1")
+                .param("size", "100"))
+                .andExpect(status().isOk())
+                .andReturn();
+        
+        String listJson = listResult.getResponse().getContentAsString();
+        // 解析获取最后一条记录的ID
+        Result<Map<String, Object>> pageResult = objectMapper.readValue(listJson, 
+                new TypeReference<Result<Map<String, Object>>>() {});
+        java.util.List<Map<String, Object>> records = (java.util.List<Map<String, Object>>) pageResult.getData().get("records");
+        Long deleteId = ((Number) records.get(records.size() - 1).get("id")).longValue();
+
+        mockMvc.perform(delete("/api/elder/" + deleteId)
                 .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
@@ -460,9 +488,24 @@ public class ApiIntegrationTest {
                 .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(worker)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
 
-        mockMvc.perform(delete("/api/worker/3")
+        // 从分页接口获取最新添加的护工ID进行删除
+        MvcResult listResult = mockMvc.perform(get("/api/worker/page")
+                .header("Authorization", "Bearer " + token)
+                .param("current", "1")
+                .param("size", "100"))
+                .andExpect(status().isOk())
+                .andReturn();
+        
+        String listJson = listResult.getResponse().getContentAsString();
+        Result<Map<String, Object>> pageResult = objectMapper.readValue(listJson, 
+                new TypeReference<Result<Map<String, Object>>>() {});
+        java.util.List<Map<String, Object>> records = (java.util.List<Map<String, Object>>) pageResult.getData().get("records");
+        Long deleteId = ((Number) records.get(records.size() - 1).get("id")).longValue();
+
+        mockMvc.perform(delete("/api/worker/" + deleteId)
                 .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
@@ -482,9 +525,24 @@ public class ApiIntegrationTest {
                 .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(service)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
 
-        mockMvc.perform(delete("/api/service/3")
+        // 从分页接口获取最新添加的服务ID进行删除
+        MvcResult listResult = mockMvc.perform(get("/api/service/page")
+                .header("Authorization", "Bearer " + token)
+                .param("current", "1")
+                .param("size", "100"))
+                .andExpect(status().isOk())
+                .andReturn();
+        
+        String listJson = listResult.getResponse().getContentAsString();
+        Result<Map<String, Object>> pageResult = objectMapper.readValue(listJson, 
+                new TypeReference<Result<Map<String, Object>>>() {});
+        java.util.List<Map<String, Object>> records = (java.util.List<Map<String, Object>>) pageResult.getData().get("records");
+        Long deleteId = ((Number) records.get(records.size() - 1).get("id")).longValue();
+
+        mockMvc.perform(delete("/api/service/" + deleteId)
                 .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));

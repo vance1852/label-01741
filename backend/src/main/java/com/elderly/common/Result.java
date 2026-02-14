@@ -2,6 +2,17 @@ package com.elderly.common;
 
 import lombok.Data;
 
+/**
+ * 统一响应结果
+ * 错误码规范:
+ * - 200: 成功
+ * - 400: 参数错误
+ * - 401: 未认证/认证失败
+ * - 403: 无权限
+ * - 404: 资源不存在
+ * - 409: 业务冲突
+ * - 500: 系统错误
+ */
 @Data
 public class Result<T> {
     private int code;
@@ -21,10 +32,7 @@ public class Result<T> {
     }
 
     public static <T> Result<T> error(String message) {
-        Result<T> result = new Result<>();
-        result.setCode(500);
-        result.setMessage(message);
-        return result;
+        return error(500, message);
     }
 
     public static <T> Result<T> error(int code, String message) {
@@ -32,5 +40,26 @@ public class Result<T> {
         result.setCode(code);
         result.setMessage(message);
         return result;
+    }
+    
+    // 语义化错误方法
+    public static <T> Result<T> badRequest(String message) {
+        return error(400, message);
+    }
+    
+    public static <T> Result<T> unauthorized(String message) {
+        return error(401, message);
+    }
+    
+    public static <T> Result<T> forbidden(String message) {
+        return error(403, message);
+    }
+    
+    public static <T> Result<T> notFound(String message) {
+        return error(404, message);
+    }
+    
+    public static <T> Result<T> conflict(String message) {
+        return error(409, message);
     }
 }

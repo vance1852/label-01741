@@ -36,14 +36,14 @@ public class AuthController {
     public Result<?> login(@Valid @RequestBody LoginDTO dto, HttpServletRequest request) {
         SysUser user = sysUserService.findByUsername(dto.getUsername());
         if (user == null) {
-            return Result.error("用户不存在");
+            return Result.unauthorized("用户不存在");
         }
         if (user.getStatus() != 1) {
-            return Result.error("账号已被禁用");
+            return Result.forbidden("账号已被禁用");
         }
         // 仅使用BCrypt哈希校验
         if (!BCrypt.checkpw(dto.getPassword(), user.getPassword())) {
-            return Result.error("密码错误");
+            return Result.unauthorized("密码错误");
         }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         

@@ -34,9 +34,6 @@ public class ElderController {
 
     @PostMapping
     public Result<?> save(@Valid @RequestBody Elder elder) {
-        if (elder.getName() == null || elder.getName().isBlank()) {
-            return Result.error("姓名不能为空");
-        }
         elderService.save(elder);
         return Result.success();
     }
@@ -44,7 +41,7 @@ public class ElderController {
     @PutMapping
     public Result<?> update(@Valid @RequestBody Elder elder) {
         if (elder.getId() == null) {
-            return Result.error("ID不能为空");
+            return Result.badRequest("ID不能为空");
         }
         elderService.update(elder);
         return Result.success();
