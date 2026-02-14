@@ -100,9 +100,9 @@ CREATE TABLE sys_log (
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 测试数据
+-- 测试数据 (密码: admin123)
 INSERT INTO sys_user (username, password, real_name, phone, role, status) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', '系统管理员', '13800138000', 1, 1);
+('admin', '$2a$10$h2IhdL4OZx7ato1DxLYXqeSssBWC.fjevi8X/MHgxAKSt/UnhtAMG', '系统管理员', '13800138000', 1, 1);
 
 INSERT INTO elder (name, gender, birth_date, id_card, phone, address, emergency_contact, emergency_phone, health_status) VALUES
 ('张福贵', 1, '1945-03-15', '110101194503150011', '13900139001', '北京市朝阳区', '张明华', '13900139002', 1),

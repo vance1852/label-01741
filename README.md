@@ -2,12 +2,35 @@
 
 基于 Spring Boot + Vue 3 + MySQL 的智慧养老综合管理平台。
 
+## 环境变量配置
+
+### 生产环境（必须配置）
+
+复制 `.env.example` 为 `.env` 并配置以下变量：
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| MYSQL_ROOT_PASSWORD | 数据库密码 | your_secure_password |
+| JWT_SECRET | JWT签名密钥（至少32字符） | your-very-long-secret-key |
+| CORS_ALLOWED_ORIGINS | 允许的跨域来源 | https://your-domain.com |
+| SPRING_PROFILES_ACTIVE | Spring环境 | prod |
+| LOG_LEVEL | 日志级别 | info / warn |
+
+### 开发环境
+
+开发环境可使用默认值，但建议配置 `DB_PASSWORD` 和 `JWT_SECRET`。
+
 ## How to Run
 
 ### Docker 方式（推荐）
 
 ```bash
-# 启动所有服务
+# 开发环境（使用默认配置）
+docker-compose up --build -d
+
+# 生产环境（使用.env文件）
+cp .env.example .env
+# 编辑 .env 配置生产参数
 docker-compose up --build -d
 
 # 查看日志
@@ -20,11 +43,18 @@ docker-compose down
 ### 本地开发
 
 1. 启动 MySQL 并执行 `backend/src/main/resources/schema.sql`
-2. 启动后端：
+
+2. 配置环境变量并启动后端：
 ```bash
 cd backend
+# Windows PowerShell
+$env:DB_PASSWORD="123456"; $env:JWT_SECRET="dev-secret-key-for-local-development"
 mvn spring-boot:run
+
+# Linux/Mac
+DB_PASSWORD=123456 JWT_SECRET=dev-secret-key-for-local-development mvn spring-boot:run
 ```
+
 3. 启动前端：
 ```bash
 cd frontend-admin
@@ -34,11 +64,20 @@ npm run dev
 
 ## Services
 
+### Docker 部署
+
 | 服务 | 地址 | 说明 |
 |------|------|------|
 | 管理后台 | http://localhost:8081 | Vue 3 管理端 |
-| 后端 API | http://localhost:8080 | Spring Boot API |
+| 后端 API | http://localhost:8080/api | Spring Boot API |
 | MySQL | localhost:3306 | 数据库 |
+
+### 本地开发
+
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| 前端开发服务器 | http://localhost:5173 | Vite Dev Server（自动代理API） |
+| 后端 API | http://localhost:8080/api | Spring Boot API |
 
 ## 测试账号
 
@@ -46,9 +85,12 @@ npm run dev
 |--------|------|------|
 | admin | admin123 | 管理员 |
 
-## 题目内容
+## 安全说明
 
-可以帮我生成一个智慧养老的系统吗？使用Java编写后端框架用SpringBoot，前端Vue，数据库Mysql。
+- 生产环境必须配置强密码和JWT密钥
+- 生产环境应限制CORS来源为具体域名
+- 建议启用HTTPS和CSP安全策略
+- 前端使用localStorage存储token，需配合XSS防护
 
 ---
 

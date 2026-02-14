@@ -1,6 +1,8 @@
 package com.elderly.config;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.elderly.common.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,20 +21,22 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
         String token = request.getHeader("Authorization");
         if (StrUtil.isBlank(token)) {
-            response.setStatus(401);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"message\":\"未登录\"}");
+            writeErrorResponse(response, 401, "未登录");
             return false;
         }
         token = token.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-            response.setStatus(401);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"message\":\"token无效\"}");
+            writeErrorResponse(response, 401, "token无效或已过期");
             return false;
         }
         request.setAttribute("userId", jwtUtil.getUserId(token));
         request.setAttribute("username", jwtUtil.getUsername(token));
         return true;
+    }
+    
+    private void writeErrorResponse(HttpServletResponse response, int code, String message) throws Exception {
+        response.setStatus(code);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(JSONUtil.toJsonStr(Result.error(code, message)));
     }
 }

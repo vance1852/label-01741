@@ -38,6 +38,8 @@ public class LogAspect {
         return result;
     }
 
+    private static final java.util.Set<String> SENSITIVE_FIELDS = java.util.Set.of("password", "pwd", "secret", "token", "credential");
+    
     private void saveLog(ProceedingJoinPoint point, long time) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) return;
@@ -55,11 +57,32 @@ public class LogAspect {
         sysLog.setUsername((String) request.getAttribute("username"));
         sysLog.setOperation(getOperation(request.getRequestURI(), method));
         sysLog.setMethod(point.getSignature().getDeclaringTypeName() + "." + point.getSignature().getName());
-        sysLog.setParams(JSONUtil.toJsonStr(point.getArgs()));
+        sysLog.setParams(sanitizeParams(point.getArgs()));
         sysLog.setIp(getIpAddress(request));
         
         sysLogService.save(sysLog);
         log.info("操作日志: {} - {} - {}ms", sysLog.getOperation(), sysLog.getMethod(), time);
+    }
+    
+    private String sanitizeParams(Object[] args) {
+        if (args == null || args.length == 0) return "[]";
+        try {
+            String json = JSONUtil.toJsonStr(args);
+            cn.hutool.json.JSONArray arr = JSONUtil.parseArray(json);
+            for (int i = 0; i < arr.size(); i++) {
+                Object item = arr.get(i);
+                if (item instanceof cn.hutool.json.JSONObject obj) {
+                    for (String key : obj.keySet()) {
+                        if (SENSITIVE_FIELDS.stream().anyMatch(s -> key.toLowerCase().contains(s))) {
+                            obj.set(key, "******");
+                        }
+                    }
+                }
+            }
+            return arr.toString();
+        } catch (Exception e) {
+            return "[参数序列化失败]";
+        }
     }
 
     private String getOperation(String uri, String method) {

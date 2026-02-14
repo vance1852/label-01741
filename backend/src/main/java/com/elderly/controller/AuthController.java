@@ -41,8 +41,8 @@ public class AuthController {
         if (user.getStatus() != 1) {
             return Result.error("账号已被禁用");
         }
-        // 简化密码验证，实际项目应使用BCrypt
-        if (!dto.getPassword().equals("admin123") && !BCrypt.checkpw(dto.getPassword(), user.getPassword())) {
+        // 仅使用BCrypt哈希校验
+        if (!BCrypt.checkpw(dto.getPassword(), user.getPassword())) {
             return Result.error("密码错误");
         }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());

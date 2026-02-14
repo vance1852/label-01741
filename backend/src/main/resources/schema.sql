@@ -109,9 +109,9 @@ CREATE TABLE sys_log (
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统日志表';
 
--- 初始化管理员账号 (密码: admin123)
+-- 初始化管理员账号 (密码: admin123, BCrypt哈希 cost=10)
 INSERT INTO sys_user (username, password, real_name, phone, role, status) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', '系统管理员', '13800138000', 1, 1);
+('admin', '$2a$10$h2IhdL4OZx7ato1DxLYXqeSssBWC.fjevi8X/MHgxAKSt/UnhtAMG', '系统管理员', '13800138000', 1, 1);
 
 -- 初始化老人测试数据
 INSERT INTO elder (name, gender, birth_date, id_card, phone, address, emergency_contact, emergency_phone, health_status) VALUES
