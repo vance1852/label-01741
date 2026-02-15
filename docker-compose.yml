@@ -1,11 +1,19 @@
-version: '3.8'
+# 智慧养老系统 Docker Compose 配置
+# 
+# 开发环境快速启动（使用内置默认值）:
+#   docker-compose up --build -d
+#
+# 生产环境部署（必须配置 .env 文件）:
+#   cp .env.example .env  # 然后编辑 .env 配置必填项
+#   docker-compose up --build -d
 
 services:
   mysql:
     image: mysql:8.0
     container_name: elderly-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      # 开发环境使用默认密码，生产环境必须通过 .env 配置强密码
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-dev_password_123}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-elderly_care}
       TZ: Asia/Shanghai
       LANG: C.UTF-8
@@ -29,11 +37,14 @@ services:
       DB_PORT: 3306
       DB_NAME: ${MYSQL_DATABASE:-elderly_care}
       DB_USER: root
-      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
-      JWT_SECRET: ${JWT_SECRET:-elderly-care-secret-key-2024-very-long-string-for-security}
+      # 开发环境使用默认密码，生产环境必须通过 .env 配置
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-dev_password_123}
+      # 开发环境使用默认密钥，生产环境必须通过 .env 配置强密钥
+      JWT_SECRET: ${JWT_SECRET:-dev-only-jwt-secret-key-not-for-production-use}
       TZ: Asia/Shanghai
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      # 开发环境允许所有来源，生产环境必须通过 .env 配置具体域名
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-*}
       MYBATIS_LOG_IMPL: ${MYBATIS_LOG_IMPL:-org.apache.ibatis.logging.nologging.NoLoggingImpl}
     ports:

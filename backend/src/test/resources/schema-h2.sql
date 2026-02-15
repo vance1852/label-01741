@@ -72,8 +72,16 @@ CREATE TABLE service_order (
     remark VARCHAR(500),
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted INT DEFAULT 0
+    deleted INT DEFAULT 0,
+    CONSTRAINT fk_order_elder FOREIGN KEY (elder_id) REFERENCES elder(id),
+    CONSTRAINT fk_order_service FOREIGN KEY (service_id) REFERENCES service_item(id),
+    CONSTRAINT fk_order_worker FOREIGN KEY (worker_id) REFERENCES care_worker(id)
 );
+CREATE INDEX idx_order_elder_id ON service_order(elder_id);
+CREATE INDEX idx_order_service_id ON service_order(service_id);
+CREATE INDEX idx_order_worker_id ON service_order(worker_id);
+CREATE INDEX idx_order_status ON service_order(status);
+CREATE INDEX idx_order_appointment_time ON service_order(appointment_time);
 
 CREATE TABLE health_record (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -86,8 +94,11 @@ CREATE TABLE health_record (
     remark VARCHAR(500),
     record_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted INT DEFAULT 0
+    deleted INT DEFAULT 0,
+    CONSTRAINT fk_health_elder FOREIGN KEY (elder_id) REFERENCES elder(id)
 );
+CREATE INDEX idx_health_elder_id ON health_record(elder_id);
+CREATE INDEX idx_health_record_time ON health_record(record_time);
 
 CREATE TABLE sys_log (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -99,6 +110,8 @@ CREATE TABLE sys_log (
     ip VARCHAR(50),
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX idx_log_user_id ON sys_log(user_id);
+CREATE INDEX idx_log_create_time ON sys_log(create_time);
 
 -- 测试数据 (密码: admin123)
 INSERT INTO sys_user (username, password, real_name, phone, role, status) VALUES

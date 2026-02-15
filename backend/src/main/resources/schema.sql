@@ -80,7 +80,18 @@ CREATE TABLE service_order (
     remark VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '备注',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    deleted INT DEFAULT 0 COMMENT '逻辑删除'
+    deleted INT DEFAULT 0 COMMENT '逻辑删除',
+    -- 外键约束
+    CONSTRAINT fk_order_elder FOREIGN KEY (elder_id) REFERENCES elder(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_order_service FOREIGN KEY (service_id) REFERENCES service_item(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_order_worker FOREIGN KEY (worker_id) REFERENCES care_worker(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    -- 索引
+    INDEX idx_order_elder_id (elder_id),
+    INDEX idx_order_service_id (service_id),
+    INDEX idx_order_worker_id (worker_id),
+    INDEX idx_order_status (status),
+    INDEX idx_order_appointment_time (appointment_time),
+    INDEX idx_order_create_time (create_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='服务订单表';
 
 -- 健康记录表
@@ -96,7 +107,12 @@ CREATE TABLE health_record (
     remark VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '备注',
     record_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '记录时间',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    deleted INT DEFAULT 0 COMMENT '逻辑删除'
+    deleted INT DEFAULT 0 COMMENT '逻辑删除',
+    -- 外键约束
+    CONSTRAINT fk_health_elder FOREIGN KEY (elder_id) REFERENCES elder(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    -- 索引
+    INDEX idx_health_elder_id (elder_id),
+    INDEX idx_health_record_time (record_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='健康记录表';
 
 -- 系统日志表
@@ -109,7 +125,10 @@ CREATE TABLE sys_log (
     method VARCHAR(200) COMMENT '请求方法',
     params TEXT COMMENT '请求参数',
     ip VARCHAR(50) COMMENT 'IP地址',
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    -- 索引
+    INDEX idx_log_user_id (user_id),
+    INDEX idx_log_create_time (create_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统日志表';
 
 -- 初始化管理员账号 (密码: admin123, BCrypt哈希 cost=10)

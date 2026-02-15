@@ -56,11 +56,11 @@ docker-compose up --build -d
 cd backend
 
 # Windows PowerShell
-$env:DB_PASSWORD="123456"
+$env:DB_PASSWORD="dev_password_123"
 mvn spring-boot:run
 
 # Linux/Mac
-DB_PASSWORD=123456 mvn spring-boot:run
+DB_PASSWORD=dev_password_123 mvn spring-boot:run
 ```
 
 3. 启动前端：
@@ -88,10 +88,15 @@ npm run dev
 
 ## 安全说明
 
-- 开发环境默认 CORS 允许所有来源（`*`），仅用于开发调试
-- 生产环境必须配置 `CORS_ALLOWED_ORIGINS` 为具体域名
-- 生产环境必须配置强 `JWT_SECRET`（至少32字符）
-- 建议启用 HTTPS 和 CSP 安全策略
+⚠️ **重要安全提醒**：
+
+- **开发环境默认配置仅用于本地开发调试**，包含弱密码和宽松的CORS策略
+- **生产环境部署前必须配置 `.env` 文件**，否则存在严重安全风险：
+  - `MYSQL_ROOT_PASSWORD`: 必须使用强密码（默认 `dev_password_123` 仅用于开发）
+  - `JWT_SECRET`: 必须使用至少32字符的随机密钥（默认密钥仅用于开发）
+  - `CORS_ALLOWED_ORIGINS`: 必须配置为具体域名（默认 `*` 仅用于开发）
+- 生产环境建议启用 HTTPS 和 CSP 安全策略
+- 数据库已配置外键约束和索引，确保数据一致性和查询性能
 
 ## 功能模块
 
