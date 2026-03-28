@@ -21,11 +21,42 @@
       </el-col>
       <el-col :span="6">
         <div class="stat-card danger">
-          <div class="stat-value">{{ stats.completedOrders || 0 }}</div>
-          <div class="stat-label">已完成订单</div>
+          <div class="stat-value">{{ warnings.length }}</div>
+          <div class="stat-label">健康预警</div>
         </div>
       </el-col>
     </el-row>
+    
+    <div class="card" style="margin-top: 24px;" v-if="warnings.length > 0">
+      <div class="card-header">
+        <span class="card-title">健康预警</span>
+      </div>
+      <div class="warning-list">
+        <div v-for="warning in warnings" :key="warning.id" class="warning-card" :class="'level-' + warning.warningLevel">
+          <div class="warning-header">
+            <span class="warning-type">{{ getWarningTypeText(warning.warningType) }}</span>
+            <span class="warning-level-tag">{{ getLevelText(warning.warningLevel) }}</span>
+          </div>
+          <div class="warning-content">
+            <div class="warning-item">
+              <span class="warning-label">老人姓名：</span>
+              <span class="warning-value">{{ warning.elderName }}</span>
+            </div>
+            <div class="warning-item">
+              <span class="warning-label">异常指标：</span>
+              <span class="warning-value">{{ warning.abnormalIndicators }}</span>
+            </div>
+            <div class="warning-item">
+              <span class="warning-label">记录时间：</span>
+              <span class="warning-value">{{ warning.createTime }}</span>
+            </div>
+          </div>
+          <div class="warning-actions">
+            <el-button type="primary" size="small" @click="handleWarningClick(warning.id)">标记为已处理</el-button>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <div class="card" style="margin-top: 24px;">
       <div class="card-header">
@@ -63,13 +94,46 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getDashboardStats } from '../api'
+import { getDashboardStats, getDashboardWarnings, handleWarning } from '../api'
+import { ElMessage } from 'element-plus'
 
 const stats = ref({})
+const warnings = ref([])
+
+const getWarningTypeText = (type) => {
+  const typeMap = {
+    HIGH_BLOOD_PRESSURE: '高血压预警',
+    HIGH_BLOOD_SUGAR: '高血糖预警',
+    HIGH_TEMPERATURE: '发热预警',
+    HEART_RATE: '心率异常预警'
+  }
+  return typeMap[type] || type
+}
+
+const getLevelText = (level) => {
+  const levelMap = {
+    1: '一般',
+    2: '重要',
+    3: '紧急'
+  }
+  return levelMap[level] || level
+}
+
+const loadWarnings = async () => {
+  const res = await getDashboardWarnings()
+  warnings.value = res.data
+}
+
+const handleWarningClick = async (id) => {
+  await handleWarning(id)
+  ElMessage.success('已标记为已处理')
+  loadWarnings()
+}
 
 onMounted(async () => {
   const res = await getDashboardStats()
   stats.value = res.data
+  loadWarnings()
 })
 </script>
 
@@ -94,5 +158,80 @@ onMounted(async () => {
     font-size: 13px;
     color: #909399;
   }
+}
+
+.warning-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.warning-card {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fff;
+  
+  &.level-1 {
+    border-left: 4px solid #67c23a;
+  }
+  
+  &.level-2 {
+    border-left: 4px solid #e6a23c;
+  }
+  
+  &.level-3 {
+    border-left: 4px solid #f56c6c;
+  }
+}
+
+.warning-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.warning-type {
+  font-size: 16px;
+  font-weight: bold;
+  color: #303133;
+}
+
+.warning-level-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #f0f0f0;
+  color: #606266;
+}
+
+.warning-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.warning-item {
+  display: flex;
+  font-size: 14px;
+}
+
+.warning-label {
+  color: #909399;
+  min-width: 80px;
+}
+
+.warning-value {
+  color: #303133;
+  flex: 1;
+}
+
+.warning-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

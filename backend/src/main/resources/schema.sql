@@ -115,6 +115,30 @@ CREATE TABLE health_record (
     INDEX idx_health_record_time (record_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='健康记录表';
 
+-- 健康预警表
+DROP TABLE IF EXISTS health_warning;
+CREATE TABLE health_warning (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+    elder_id BIGINT NOT NULL COMMENT '老人ID',
+    record_id BIGINT NOT NULL COMMENT '关联的健康记录ID',
+    warning_type VARCHAR(50) NOT NULL COMMENT '预警类型:HIGH_BLOOD_PRESSURE-高血压,HIGH_BLOOD_SUGAR-高血糖,HIGH_TEMPERATURE-发热,HEART_RATE-心率异常',
+    warning_level INT NOT NULL COMMENT '预警等级:1-一般,2-重要,3-紧急',
+    abnormal_indicators VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '异常指标详情',
+    status INT DEFAULT 0 COMMENT '状态:0-未处理,1-已处理',
+    handled_time DATETIME COMMENT '处理时间',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted INT DEFAULT 0 COMMENT '逻辑删除',
+    -- 外键约束
+    CONSTRAINT fk_warning_elder FOREIGN KEY (elder_id) REFERENCES elder(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_warning_record FOREIGN KEY (record_id) REFERENCES health_record(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    -- 索引
+    INDEX idx_warning_elder_id (elder_id),
+    INDEX idx_warning_record_id (record_id),
+    INDEX idx_warning_status (status),
+    INDEX idx_warning_create_time (create_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='健康预警表';
+
 -- 系统日志表
 DROP TABLE IF EXISTS sys_log;
 CREATE TABLE sys_log (
