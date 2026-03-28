@@ -7,6 +7,12 @@ export const logout = () => request.post('/auth/logout')
 
 // 仪表盘
 export const getDashboardStats = () => request.get('/dashboard/stats')
+export const getDashboardWarnings = () => request.get('/dashboard/warnings')
+
+// 健康预警
+export const getWarningPage = params => request.get('/warnings/page', { params })
+export const getActiveWarnings = () => request.get('/warnings/active')
+export const handleWarning = id => request.post(`/warnings/${id}/handle`)
 
 // 老人管理
 export const getElderPage = params => request.get('/elder/page', { params })

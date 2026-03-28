@@ -3,11 +3,13 @@ package com.elderly.controller;
 import com.elderly.common.Result;
 import com.elderly.service.CareWorkerService;
 import com.elderly.service.ElderService;
+import com.elderly.service.HealthWarningService;
 import com.elderly.service.ServiceOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +20,7 @@ public class DashboardController {
     private final ElderService elderService;
     private final CareWorkerService careWorkerService;
     private final ServiceOrderService serviceOrderService;
+    private final HealthWarningService healthWarningService;
 
     @GetMapping("/stats")
     public Result<?> stats() {
@@ -27,5 +30,10 @@ public class DashboardController {
         stats.put("pendingOrders", serviceOrderService.countByStatus(0));
         stats.put("completedOrders", serviceOrderService.countByStatus(2));
         return Result.success(stats);
+    }
+    
+    @GetMapping("/warnings")
+    public Result<?> getWarnings() {
+        return Result.success(healthWarningService.getActiveWarnings());
     }
 }

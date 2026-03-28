@@ -8,19 +8,39 @@
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column prop="elderName" label="老人姓名" width="100" />
         <el-table-column prop="bloodPressureHigh" label="收缩压" width="90">
-          <template #default="{ row }">{{ row.bloodPressureHigh || '-' }}</template>
+          <template #default="{ row }">
+            <span :class="{ 'text-red': isBloodPressureHighAbnormal(row.bloodPressureHigh) }">
+              {{ row.bloodPressureHigh || '-' }}
+            </span>
+          </template>
         </el-table-column>
         <el-table-column prop="bloodPressureLow" label="舒张压" width="90">
-          <template #default="{ row }">{{ row.bloodPressureLow || '-' }}</template>
+          <template #default="{ row }">
+            <span :class="{ 'text-red': isBloodPressureLowAbnormal(row.bloodPressureLow) }">
+              {{ row.bloodPressureLow || '-' }}
+            </span>
+          </template>
         </el-table-column>
         <el-table-column prop="heartRate" label="心率" width="80">
-          <template #default="{ row }">{{ row.heartRate || '-' }}</template>
+          <template #default="{ row }">
+            <span :class="{ 'text-red': isHeartRateAbnormal(row.heartRate) }">
+              {{ row.heartRate || '-' }}
+            </span>
+          </template>
         </el-table-column>
         <el-table-column prop="bloodSugar" label="血糖" width="80">
-          <template #default="{ row }">{{ row.bloodSugar || '-' }}</template>
+          <template #default="{ row }">
+            <span :class="{ 'text-red': isBloodSugarAbnormal(row.bloodSugar) }">
+              {{ row.bloodSugar || '-' }}
+            </span>
+          </template>
         </el-table-column>
         <el-table-column prop="temperature" label="体温" width="80">
-          <template #default="{ row }">{{ row.temperature || '-' }}</template>
+          <template #default="{ row }">
+            <span :class="{ 'text-red': isTemperatureAbnormal(row.temperature) }">
+              {{ row.temperature || '-' }}
+            </span>
+          </template>
         </el-table-column>
         <el-table-column prop="remark" label="备注" min-width="150" show-overflow-tooltip />
         <el-table-column prop="recordTime" label="记录时间" width="180" />
@@ -143,8 +163,35 @@ const handleSubmit = async () => {
   }
 }
 
+const isBloodPressureHighAbnormal = (value) => {
+  return value && value >= 140
+}
+
+const isBloodPressureLowAbnormal = (value) => {
+  return value && value >= 90
+}
+
+const isHeartRateAbnormal = (value) => {
+  return value && (value >= 100 || value <= 50)
+}
+
+const isBloodSugarAbnormal = (value) => {
+  return value && value >= 7.0
+}
+
+const isTemperatureAbnormal = (value) => {
+  return value && value >= 37.3
+}
+
 onMounted(() => {
   loadData()
   loadElders()
 })
 </script>
+
+<style scoped>
+.text-red {
+  color: #f56c6c;
+  font-weight: bold;
+}
+</style>
